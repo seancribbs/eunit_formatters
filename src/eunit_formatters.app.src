@@ -1,0 +1,12 @@
+{application, eunit_formatters,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { eunit_formatters_app, []}},
+  {env, []}
+ ]}.
