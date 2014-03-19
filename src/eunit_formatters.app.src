@@ -1,12 +1,11 @@
 {application, eunit_formatters,
  [
-  {description, ""},
-  {vsn, "1"},
-  {registered, []},
+  {description, "Better output for eunit suites"},
+  {vsn, git},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  eunit
                  ]},
-  {mod, { eunit_formatters_app, []}},
   {env, []}
  ]}.
