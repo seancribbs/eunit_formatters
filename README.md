@@ -24,11 +24,6 @@ only `eunit_progress`):
      ]}.
 ```
 
-## TODO
-
-* Be able to turn off profiling.
-* Extract common functionality, like the end-of-run reports.
-
 ## License
 
    Copyright 2014 Sean Cribbs
