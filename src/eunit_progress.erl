@@ -220,7 +220,7 @@ print_profile(#state{timings=T, status=Status, profile=true}=State) ->
     if TLG > 0 ->
             TopNPct = (TopNTime / TotalTime) * 100,
             io:nl(), io:nl(),
-            io:fwrite("Top 10 slowest tests (~s, ~.1f% of total time):", [format_time(TopNTime), TopNPct]),
+            io:fwrite("Top ~p slowest tests (~s, ~.1f% of total time):", [length(TopN), format_time(TopNTime), TopNPct]),
             lists:foreach(print_timing_fun(State), TopN),
             io:nl();
        true -> ok
