@@ -107,7 +107,7 @@ print_progress(Data, St) ->
             St#state{failures=[TID|St#state.failures]}
     end.
 
-record_timing(Data, State=#state{timings = T}) ->
+record_timing(Data, State=#state{timings=T, profile=true}) ->
     TID = proplists:get_value(id, Data),
     case lists:keyfind(time, 1, Data) of
         {time, Int} ->
@@ -117,7 +117,9 @@ record_timing(Data, State=#state{timings = T}) ->
             State#state{timings=T1};
         false ->
             State
-    end.
+    end;
+record_timing(_Data, State) ->
+    State.
 
 print_progress_success(St) ->
     print_colored(".", ?GREEN, St).
