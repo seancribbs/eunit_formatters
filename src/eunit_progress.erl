@@ -149,7 +149,8 @@ print_failures(#state{failures=[]}) ->
 print_failures(#state{failures=Fails}=State) ->
     io:nl(),
     io:fwrite("Failures:~n~n",[]),
-    lists:foldr(print_failure_fun(State), 1, Fails).
+    lists:foldr(print_failure_fun(State), 1, Fails),
+    ok.
 
 print_failure_fun(#state{status=Status}=State) ->
     fun(Key, Count) ->
