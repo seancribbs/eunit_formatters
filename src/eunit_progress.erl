@@ -167,7 +167,7 @@ print_failure_reason({skipped, Reason}, _Output, State) ->
 print_failure_reason({error, {_Class, Term, Stack}}, Output, State) when
       is_tuple(Term), tuple_size(Term) == 2, is_list(element(2, Term)) ->
     print_assertion_failure(Term, Stack, Output, State);
-print_failure_reason({error, Reason}, Output, State) ->    
+print_failure_reason({error, Reason}, Output, State) ->
     %% print_failure_reason(Reason, Output, State);
     print_colored(indent(5, "Failure/Error: ~p~n", [Reason]), ?RED, State),
     print_colored(indent(5, "Output: ~s", [Output]), ?CYAN, State).
@@ -212,7 +212,7 @@ print_pending_reason(Reason0, Data, State) ->
     print_colored(Text, ?YELLOW, State),
     print_colored(Reason, ?CYAN, State).
 
-print_profile(#state{timings=T, status=Status}=State) ->
+print_profile(#state{timings=T, status=Status, profile=true}=State) ->
     TopN = binomial_heap:take(10, T),
     TopNTime = abs(lists:sum([ Time || {Time, _} <- TopN ])),
     TLG = dict:fetch([], Status),
@@ -221,7 +221,9 @@ print_profile(#state{timings=T, status=Status}=State) ->
     io:nl(), io:nl(),
     io:fwrite("Top 10 slowest tests (~s, ~.1f% of total time):", [format_time(TopNTime), TopNPct]),
     lists:foreach(print_timing_fun(State), TopN),
-    io:nl().
+    io:nl();
+print_profile(#state{profile=false}) ->
+    ok.
 
 print_timing(#state{status=Status}) ->
     TLG = dict:fetch([], Status),
@@ -339,7 +341,7 @@ format_assertion_failure(assertEqual_failed, Props, I) ->
 format_assertion_failure(assertNotEqual_failed, Props, I) ->
     Expr = proplists:get_value(expression, Props),
     Value = proplists:get_value(value, Props),
-    [indent(I, "Failure/Error: ?assertNotEqual(~p, ~s)~n", 
+    [indent(I, "Failure/Error: ?assertNotEqual(~p, ~s)~n",
             [Value, Expr]),
      indent(I, "  expected not: == ~p~n", [Value]),
      indent(I, "           got:    ~p", [Value])];
@@ -347,7 +349,7 @@ format_assertion_failure(assertNotEqual_failed, Props, I) ->
 format_assertion_failure(assertException_failed, Props, I) ->
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
-    {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DATA    
+    {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DATA
     [indent(I, "Failure/Error: ?assertException(~s, ~s, ~s)~n", [Class, Term, Expr]),
      case proplists:is_defined(unexpected_success, Props) of
          true ->
