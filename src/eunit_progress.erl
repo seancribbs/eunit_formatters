@@ -27,8 +27,14 @@
          start/1
         ]).
 
+-ifdef(namespaced_dicts).
+-type euf_dict() :: dict:dict().
+-else.
+-type euf_dict() :: dict().
+-endif.
+
 -record(state, {
-          status = dict:new() :: dict(),
+          status = dict:new() :: euf_dict(),
           failures = [] :: [[pos_integer()]],
           skips = [] :: [[pos_integer()]],
           timings = binomial_heap:new() :: binomial_heap:binomial_heap(),
