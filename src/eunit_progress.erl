@@ -231,7 +231,7 @@ print_profile(#state{timings=T, status=Status, profile=true}=State) ->
     TopNTime = abs(lists:sum([ Time || {Time, _} <- TopN ])),
     TLG = dict:fetch([], Status),
     TotalTime = proplists:get_value(time, TLG),
-    if TLG > 0 ->
+    if TLG > 0 andalso TopN =/= [] ->
             TopNPct = (TopNTime / TotalTime) * 100,
             io:nl(), io:nl(),
             io:fwrite("Top ~p slowest tests (~s, ~.1f% of total time):", [length(TopN), format_time(TopNTime), TopNPct]),
