@@ -164,7 +164,7 @@ print_failure_fun(#state{status=Status}=State) ->
             TestId = format_test_identifier(TestData),
             io:fwrite("  ~p) ~s~n", [Count, TestId]),
             print_failure_reason(proplists:get_value(status, TestData),
-                                 proplists:get_value(output, TestData, ""),
+                                 proplists:get_value(output, TestData),
                                  State),
             io:nl(),
             Count + 1
@@ -175,13 +175,18 @@ print_failure_reason({skipped, Reason}, _Output, State) ->
                   ?RED, State);
 print_failure_reason({error, {_Class, Term, Stack}}, Output, State) when
       is_tuple(Term), tuple_size(Term) == 2, is_list(element(2, Term)) ->
-    print_assertion_failure(Term, Stack, Output, State);
+    print_assertion_failure(Term, Stack, Output, State),
+    print_failure_output(5, Output, State);
 print_failure_reason({error, Reason}, Output, State) ->
-    %% print_failure_reason(Reason, Output, State);
     print_colored(indent(5, "Failure/Error: ~p~n", [Reason]), ?RED, State),
-    print_colored(indent(5, "Output: ~s", [Output]), ?CYAN, State).
+    print_failure_output(5, Output, State).
 
-print_assertion_failure({Type, Props}, Stack, _Output, State) ->
+print_failure_output(_, <<>>, _) -> ok;
+print_failure_output(_, undefined, _) -> ok;
+print_failure_output(Indent, Output, State) ->
+    print_colored(indent(Indent, "Output: ~s", [Output]), ?CYAN, State).
+
+print_assertion_failure({Type, Props}, Stack, Output, State) ->
     FailureDesc = format_assertion_failure(Type, Props, 5),
     {M,F,A,Loc} = lists:last(Stack),
     LocationText = io_lib:format("     %% ~s:~p:in `~s`", [proplists:get_value(file, Loc),
@@ -190,8 +195,8 @@ print_assertion_failure({Type, Props}, Stack, _Output, State) ->
     print_colored(FailureDesc, ?RED, State),
     io:nl(),
     print_colored(LocationText, ?CYAN, State),
-    %% io:nl(),
-    %% print_colored(io_lib:format("     Output:~n     ~s", [Output]), ?BLUE, State),
+    io:nl(),
+    print_failure_output(5, Output, State),
     io:nl().
 
 print_pending(#state{skips=[]}) ->
