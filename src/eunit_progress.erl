@@ -27,8 +27,14 @@
          start/1
         ]).
 
+-ifdef(namespaced_dicts).
+-type euf_dict() :: dict:dict().
+-else.
+-type euf_dict() :: dict().
+-endif.
+
 -record(state, {
-          status = dict:new() :: dict(),
+          status = dict:new() :: euf_dict(),
           failures = [] :: [[pos_integer()]],
           skips = [] :: [[pos_integer()]],
           timings = binomial_heap:new() :: binomial_heap:binomial_heap(),
@@ -301,13 +307,19 @@ format_test_identifier(Data) ->
            end,
     io_lib:format("~s~s~s", [format_function_name(Mod, Fun, Arity), Line, Desc]).
 
+format_time(undefined) ->
+    "? seconds";
 format_time(Time) ->
     io_lib:format("~.3f seconds", [Time / 1000]).
 
 format_pending_reason({module_not_found, M}) ->
     io_lib:format("Module '~s' missing", [M]);
 format_pending_reason({no_such_function, {M,F,A}}) ->
-    io_lib:format("Function ~s undefined", [format_function_name(M,F,A)]).
+    io_lib:format("Function ~s undefined", [format_function_name(M,F,A)]);
+format_pending_reason({exit, Reason}) ->
+    io_lib:format("Related process exited with reason: ~p", [Reason]);
+format_pending_reason(Reason) ->
+    io_lib:format("Unknown error: ~p", [Reason]).
 
 %% @doc Formats all the known eunit assertions, you're on your own if
 %% you make an assertion yourself.
