@@ -9,7 +9,7 @@ Add `eunit_formatters` as a dep in your `rebar.config`:
 ```erlang
 {deps, [
        {eunit_formatters, ".*", {git,
-           "git://github.com/seancribbs/eunit_formatters", "master"}}
+           "git://github.com/seancribbs/eunit_formatters", {branch, "master"}}}
        ]}.
 ```
 
