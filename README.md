@@ -19,7 +19,7 @@ only `eunit_progress`):
 ```erlang
 {eunit_opts, [
      no_tty,  %% This turns off the default output, MUST HAVE
-     {report, {eunit_progress, [colored]}} 
+     {report, {eunit_progress, [colored, profile]}} %% Use `profile' to see test timing information
      %% Uses the progress formatter with ANSI-colored output
      ]}.
 ```
