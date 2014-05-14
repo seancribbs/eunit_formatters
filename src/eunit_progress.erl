@@ -329,14 +329,26 @@ format_pending_reason(Reason) ->
 %% @doc Formats all the known eunit assertions, you're on your own if
 %% you make an assertion yourself.
 format_assertion_failure(assertion_failed, Props, I) ->
-    [indent(I, "Failure/Error: ?assert(~s)~n", [proplists:get_value(expression, Props)]),
-     indent(I, "  expected: true~n", []),
-     case proplists:get_value(value, Props) of
-         false ->
-             indent(I, "       got: false", []);
-         {not_a_boolean, V} ->
-             indent(I, "       got: ~p", [V])
-     end];
+    Keys = proplists:get_keys(Props),
+    HasEUnitProps = ([expression, value] -- Keys) =:= [],
+    HasHamcrestProps = ([expected, actual, matcher] -- Keys) =:= [],
+    if
+        HasEUnitProps ->
+            [indent(I, "Failure/Error: ?assert(~s)~n", [proplists:get_value(expression, Props)]),
+             indent(I, "  expected: true~n", []),
+             case proplists:get_value(value, Props) of
+                 false ->
+                     indent(I, "       got: false", []);
+                 {not_a_boolean, V} ->
+                     indent(I, "       got: ~p", [V])
+             end];
+        HasHamcrestProps ->
+            [indent(I, "Failure/Error: ?assert(~p)~n", [proplists:get_value(matcher, Props)]),
+             indent(I, "  expected: ~p~n", [proplists:get_value(expected, Props)]),
+             indent(I, "       got: ~p", [proplists:get_value(actual, Props)])];
+        true ->
+            [indent(I, "Failure/Error: unknown assert: ~p", [Props])]
+    end;
 
 format_assertion_failure(assertMatch_failed, Props, I) ->
     Expr = proplists:get_value(expression, Props),
