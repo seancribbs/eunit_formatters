@@ -347,7 +347,7 @@ format_assertion_failure(assertion_failed, Props, I) ->
              indent(I, "  expected: ~p~n", [proplists:get_value(expected, Props)]),
              indent(I, "       got: ~p", [proplists:get_value(actual, Props)])];
         true ->
-            [indent(I, "Failure/Error: unknown assert: ~s", [Props])]
+            [indent(I, "Failure/Error: unknown assert: ~p", [Props])]
     end;
 
 format_assertion_failure(assertMatch_failed, Props, I) ->
