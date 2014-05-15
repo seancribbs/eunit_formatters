@@ -343,7 +343,7 @@ format_assertion_failure(assertion_failed, Props, I) ->
                      indent(I, "       got: ~p", [V])
              end];
         HasHamcrestProps ->
-            [indent(I, "Failure/Error: ?assert(~p)~n", [proplists:get_value(matcher, Props)]),
+            [indent(I, "Failure/Error: ?assertThat(~p)~n", [proplists:get_value(matcher, Props)]),
              indent(I, "  expected: ~p~n", [proplists:get_value(expected, Props)]),
              indent(I, "       got: ~p", [proplists:get_value(actual, Props)])];
         true ->
