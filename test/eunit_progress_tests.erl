@@ -43,3 +43,17 @@ unknown_assert_test() ->
     ?assertMatch(match, re:run(Output, Pattern, [{capture, none}])).
 
 
+%%
+%%  Check if exit reason is printed in the case, when a process linked with
+%%  the test process is terminated.
+%%
+print_process_exit_test() ->
+    {ok, Output, error} = capture_io:capture(fun () ->
+        Proc = fun () -> exit(my_error) end,
+        Test = fun () -> erlang:spawn_link(Proc), ok = receive after 100 -> error end end,
+        eunit:test(Test, [no_tty, {report, {eunit_progress, [colored, profile]}}])
+    end),
+    Pattern = "Related process exited with reason(.|\n)*my_error",
+    ?assertMatch(match, re:run(Output, Pattern, [{capture, none}])).
+
+
