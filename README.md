@@ -2,6 +2,11 @@
 
 Because eunit's output sucks. Let's make it better.
 
+Here's the progress formatter running with profiling and ANSI colors
+turned on:
+
+![neotoma eunit](demo.gif)
+
 ## Setup
 
 Add `eunit_formatters` as a dep in your `rebar.config`:
