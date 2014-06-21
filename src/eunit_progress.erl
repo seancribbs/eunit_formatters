@@ -8,6 +8,7 @@
 
 -define(RED, "\e[0;31m").
 -define(GREEN, "\e[0;32m").
+-define(BLUE, "\e[1;34m").
 -define(YELLOW, "\e[0;33m").
 -define(WHITE, "\e[0;37m").
 -define(CYAN, "\e[0;36m").
@@ -277,7 +278,7 @@ print_timing_fun(#state{status=Status}=State) ->
             TestId = format_test_identifier(TestData),
             io:nl(),
             io:fwrite("  ~s~n", [TestId]),
-            print_colored(["    "|format_time(abs(Time))], ?RED, State)
+            print_colored(["    "|format_time(abs(Time))], ?BLUE, State)
     end.
 
 %%------------------------------------------
