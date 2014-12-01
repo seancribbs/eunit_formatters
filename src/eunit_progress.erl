@@ -277,7 +277,7 @@ print_timing_fun(#state{status=Status}=State) ->
             TestId = format_test_identifier(TestData),
             io:nl(),
             io:fwrite("  ~s~n", [TestId]),
-            print_colored(["    "|format_time(abs(Time))], ?RED, State)
+            print_colored(["    "|format_time(abs(Time))], ?CYAN, State)
     end.
 
 %%------------------------------------------
