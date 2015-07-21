@@ -7,3 +7,4 @@ deps
 log
 .local_dialyzer_plt
 erln8.config
+.rebar
