@@ -7,5 +7,9 @@
                   stdlib,
                   eunit
                  ]},
-  {env, []}
+  {env, []},
+
+  {maintainers, ["Sean Cribbs"]},
+  {licenses, ["Apache2"]},
+  {links, [{"Github", "https://github.com/seancribbs/eunit_formatters"}]}
  ]}.
