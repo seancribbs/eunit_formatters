@@ -9,14 +9,17 @@ turned on:
 
 ## Setup
 
-Add `eunit_formatters` as a dep in your `rebar.config`:
+Add `eunit_formatters` as a dep in your `rebar.config`, if using [rebar3](http://rebar3.org) place it under the `test` profile:
 
 ```erlang
-{deps, [
-       {eunit_formatters, ".*", {git,
-           "git://github.com/seancribbs/eunit_formatters", {branch, "master"}}}
-       ]}.
+{profiles, [{test,
+            [{deps, [
+                    {eunit_formatters, ".*",
+                     {git, "git://github.com/seancribbs/eunit_formatters", {branch, "master"}}}
+                    ]}]}]}.
 ```
+
+Otherwise, when using rebar, simply add it to the normal deps list.
 
 Now configure eunit to use one of the output formatters (currently
 only `eunit_progress`):
