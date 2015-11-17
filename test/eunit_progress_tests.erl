@@ -55,5 +55,3 @@ print_process_exit_test() ->
     end),
     Pattern = "Related process exited with reason(.|\n)*my_error",
     ?assertMatch(match, re:run(Output, Pattern, [{capture, none}])).
-
-

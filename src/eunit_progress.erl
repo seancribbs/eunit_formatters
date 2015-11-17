@@ -91,9 +91,9 @@ terminate({error, Reason}, St) ->
 
 sync_end(Result) ->
     receive
-	{stop, Reference, ReplyTo} ->
-	    ReplyTo ! {result, Reference, Result},
-	    ok
+        {stop, Reference, ReplyTo} ->
+            ReplyTo ! {result, Reference, Result},
+            ok
     end.
 
 %%------------------------------------------
@@ -328,7 +328,8 @@ format_pending_reason(Reason) ->
 
 %% @doc Formats all the known eunit assertions, you're on your own if
 %% you make an assertion yourself.
-format_assertion_failure(assertion_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertion_failed
+                                            ; Type =:= assertion ->
     Keys = proplists:get_keys(Props),
     HasEUnitProps = ([expression, value] -- Keys) =:= [],
     HasHamcrestProps = ([expected, actual, matcher] -- Keys) =:= [],
@@ -350,14 +351,17 @@ format_assertion_failure(assertion_failed, Props, I) ->
             [indent(I, "Failure/Error: unknown assert: ~p", [Props])]
     end;
 
-format_assertion_failure(assertMatch_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertMatch_failed
+                                            ; Type =:= assertMatch ->
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     Value = proplists:get_value(value, Props),
     [indent(I, "Failure/Error: ?assertMatch(~s, ~s)~n", [Pattern, Expr]),
      indent(I, "  expected: = ~s~n", [Pattern]),
      indent(I, "       got: ~p", [Value])];
-format_assertion_failure(assertNotMatch_failed, Props, I) ->
+
+format_assertion_failure(Type, Props, I) when Type =:= assertNotMatch_failed
+                                                             ; Type =:= assertNotMatch  ->
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     Value = proplists:get_value(value, Props),
@@ -365,7 +369,8 @@ format_assertion_failure(assertNotMatch_failed, Props, I) ->
      indent(I, "  expected not: = ~s~n", [Pattern]),
      indent(I, "           got:   ~p", [Value])];
 
-format_assertion_failure(assertEqual_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertEqual_failed
+                                            ; Type =:= assertEqual  ->
     Expr = proplists:get_value(expression, Props),
     Expected = proplists:get_value(expected, Props),
     Value = proplists:get_value(value, Props),
@@ -373,7 +378,9 @@ format_assertion_failure(assertEqual_failed, Props, I) ->
                                                          Expr]),
      indent(I, "  expected: ~p~n", [Expected]),
      indent(I, "       got: ~p", [Value])];
-format_assertion_failure(assertNotEqual_failed, Props, I) ->
+
+format_assertion_failure(Type, Props, I) when Type =:= assertNotEqual_failed
+                                            ; Type =:= assertNotEqual ->
     Expr = proplists:get_value(expression, Props),
     Value = proplists:get_value(value, Props),
     [indent(I, "Failure/Error: ?assertNotEqual(~p, ~s)~n",
@@ -381,7 +388,8 @@ format_assertion_failure(assertNotEqual_failed, Props, I) ->
      indent(I, "  expected not: == ~p~n", [Value]),
      indent(I, "           got:    ~p", [Value])];
 
-format_assertion_failure(assertException_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertException_failed
+                                            ; Type =:= assertException ->
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DATA
@@ -395,7 +403,9 @@ format_assertion_failure(assertException_failed, Props, I) ->
              [indent(I, "  expected: exception ~s~n", [Pattern]),
               indent(I, "       got: exception ~p", [Ex])]
      end];
-format_assertion_failure(assertNotException_failed, Props, I) ->
+
+format_assertion_failure(Type, Props, I) when Type =:= assertNotException_failed
+                                            ; Type =:= assertNotException ->
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DAT
@@ -404,7 +414,8 @@ format_assertion_failure(assertNotException_failed, Props, I) ->
      indent(I, "  expected not: exception ~s~n", [Pattern]),
      indent(I, "           got: exception ~p", [Ex])];
 
-format_assertion_failure(command_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= command_failed
+                                            ; Type =:= command ->
     Cmd = proplists:get_value(command, Props),
     Expected = proplists:get_value(expected_status, Props),
     Status = proplists:get_value(status, Props),
@@ -412,7 +423,8 @@ format_assertion_failure(command_failed, Props, I) ->
      indent(I, "  expected: status ~p~n", [Expected]),
      indent(I, "       got: status ~p", [Status])];
 
-format_assertion_failure(assertCmd_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertCmd_failed
+                                            ; Type =:= assertCmd ->
     Cmd = proplists:get_value(command, Props),
     Expected = proplists:get_value(expected_status, Props),
     Status = proplists:get_value(status, Props),
@@ -420,7 +432,8 @@ format_assertion_failure(assertCmd_failed, Props, I) ->
      indent(I, "  expected: status ~p~n", [Expected]),
      indent(I, "       got: status ~p", [Status])];
 
-format_assertion_failure(assertCmdOutput_failed, Props, I) ->
+format_assertion_failure(Type, Props, I) when Type =:= assertCmdOutput_failed
+                                            ; Type =:= assertCmdOutput ->
     Cmd = proplists:get_value(command, Props),
     Expected = proplists:get_value(expected_output, Props),
     Output = proplists:get_value(output, Props),
