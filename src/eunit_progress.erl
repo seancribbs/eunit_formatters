@@ -329,7 +329,7 @@ format_pending_reason(Reason) ->
 %% @doc Formats all the known eunit assertions, you're on your own if
 %% you make an assertion yourself.
 format_assertion_failure(Type, Props, I) when Type =:= assertion_failed
-                                            ; Type =:= assertion ->
+                                            ; Type =:= assert ->
     Keys = proplists:get_keys(Props),
     HasEUnitProps = ([expression, value] -- Keys) =:= [],
     HasHamcrestProps = ([expected, actual, matcher] -- Keys) =:= [],
