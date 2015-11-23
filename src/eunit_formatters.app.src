@@ -9,7 +9,7 @@
                  ]},
   {env, []},
 
-  {maintainers, ["Sean Cribbs"]},
+  {maintainers, ["Sean Cribbs", "Tristan Sloughter"]},
   {licenses, ["Apache2"]},
   {links, [{"Github", "https://github.com/seancribbs/eunit_formatters"}]}
  ]}.
