@@ -162,7 +162,7 @@ print_failure_fun(#state{status=Status}=State) ->
     fun(Key, Count) ->
             TestData = dict:fetch(Key, Status),
             TestId = format_test_identifier(TestData),
-            io:fwrite("  ~p) ~s~n", [Count, TestId]),
+            io:fwrite("  ~p) ~ts~n", [Count, TestId]),
             print_failure_reason(proplists:get_value(status, TestData),
                                  proplists:get_value(output, TestData),
                                  State),
@@ -171,7 +171,7 @@ print_failure_fun(#state{status=Status}=State) ->
     end.
 
 print_failure_reason({skipped, Reason}, _Output, State) ->
-    print_colored(io_lib:format("     ~s~n", [format_pending_reason(Reason)]),
+    print_colored(io_lib:format("     ~ts~n", [format_pending_reason(Reason)]),
                   ?RED, State);
 print_failure_reason({error, {_Class, Term, Stack}}, Output, State) when
       is_tuple(Term), tuple_size(Term) == 2, is_list(element(2, Term)) ->
@@ -184,12 +184,12 @@ print_failure_reason({error, Reason}, Output, State) ->
 print_failure_output(_, <<>>, _) -> ok;
 print_failure_output(_, undefined, _) -> ok;
 print_failure_output(Indent, Output, State) ->
-    print_colored(indent(Indent, "Output: ~s", [Output]), ?CYAN, State).
+    print_colored(indent(Indent, "Output: ~ts", [Output]), ?CYAN, State).
 
 print_assertion_failure({Type, Props}, Stack, Output, State) ->
     FailureDesc = format_assertion_failure(Type, Props, 5),
     {M,F,A,Loc} = lists:last(Stack),
-    LocationText = io_lib:format("     %% ~s:~p:in `~s`", [proplists:get_value(file, Loc),
+    LocationText = io_lib:format("     %% ~ts:~p:in `~ts`", [proplists:get_value(file, Loc),
                                                            proplists:get_value(line, Loc),
                                                            format_function_name(M,F,A)]),
     print_colored(FailureDesc, ?RED, State),
@@ -218,11 +218,11 @@ print_pending(#state{status=Status, skips=Skips}=State) ->
 print_pending_reason(Reason0, Data, State) ->
     Text = case proplists:get_value(type, Data) of
                group ->
-                   io_lib:format("  ~s~n", [proplists:get_value(desc, Data)]);
+                   io_lib:format("  ~ts~n", [proplists:get_value(desc, Data)]);
                test ->
-                   io_lib:format("  ~s~n", [format_test_identifier(Data)])
+                   io_lib:format("  ~ts~n", [format_test_identifier(Data)])
            end,
-    Reason = io_lib:format("    %% ~s~n", [format_pending_reason(Reason0)]),
+    Reason = io_lib:format("    %% ~ts~n", [format_pending_reason(Reason0)]),
     print_colored(Text, ?YELLOW, State),
     print_colored(Reason, ?CYAN, State).
 
@@ -234,7 +234,7 @@ print_profile(#state{timings=T, status=Status, profile=true}=State) ->
     if TotalTime =/= undefined andalso TotalTime > 0 andalso TopN =/= [] ->
             TopNPct = (TopNTime / TotalTime) * 100,
             io:nl(), io:nl(),
-            io:fwrite("Top ~p slowest tests (~s, ~.1f% of total time):", [length(TopN), format_time(TopNTime), TopNPct]),
+            io:fwrite("Top ~p slowest tests (~ts, ~.1f% of total time):", [length(TopN), format_time(TopNTime), TopNPct]),
             lists:foreach(print_timing_fun(State), TopN),
             io:nl();
        true -> ok
@@ -246,7 +246,7 @@ print_timing(#state{status=Status}) ->
     TLG = dict:fetch([], Status),
     Time = proplists:get_value(time, TLG),
     io:nl(),
-    io:fwrite("Finished in ~s~n", [format_time(Time)]),
+    io:fwrite("Finished in ~ts~n", [format_time(Time)]),
     ok.
 
 print_results(Data, State) ->
@@ -268,7 +268,7 @@ print_results(Color, 0, _, _, _, State) ->
 print_results(Color, Total, Fail, Skip, Cancel, State) ->
     SkipText = format_optional_result(Skip, "skipped"),
     CancelText = format_optional_result(Cancel, "cancelled"),
-    Text = io_lib:format("~p tests, ~p failures~s~s~n", [Total, Fail, SkipText, CancelText]),
+    Text = io_lib:format("~p tests, ~p failures~ts~ts~n", [Total, Fail, SkipText, CancelText]),
     print_colored(Text, Color, State).
 
 print_timing_fun(#state{status=Status}=State) ->
@@ -276,7 +276,7 @@ print_timing_fun(#state{status=Status}=State) ->
             TestData = dict:fetch(Key, Status),
             TestId = format_test_identifier(TestData),
             io:nl(),
-            io:fwrite("  ~s~n", [TestId]),
+            io:fwrite("  ~ts~n", [TestId]),
             print_colored(["    "|format_time(abs(Time))], ?CYAN, State)
     end.
 
@@ -285,20 +285,20 @@ print_timing_fun(#state{status=Status}=State) ->
 %% if enabled.
 %%------------------------------------------
 print_colored(Text, Color, #state{colored=true}) ->
-    io:fwrite("~s~s~s", [Color, Text, ?RESET]);
+    io:fwrite("~s~ts~s", [Color, Text, ?RESET]);
 print_colored(Text, _Color, #state{colored=false}) ->
-    io:fwrite("~s", [Text]).
+    io:fwrite("~ts", [Text]).
 
 %%------------------------------------------
 %% Generic data formatters
 %%------------------------------------------
 format_function_name(M, F, A) ->
-    io_lib:format("~s:~s/~p", [M, F, A]).
+    io_lib:format("~ts:~ts/~p", [M, F, A]).
 
 format_optional_result(0, _) ->
     [];
 format_optional_result(Count, Text) ->
-    io_lib:format(", ~p ~s", [Count, Text]).
+    io_lib:format(", ~p ~ts", [Count, Text]).
 
 format_test_identifier(Data) ->
     {Mod, Fun, Arity} = proplists:get_value(source, Data),
@@ -308,9 +308,9 @@ format_test_identifier(Data) ->
            end,
     Desc = case proplists:get_value(desc, Data) of
                undefined ->  "";
-               DescText -> io_lib:format(": ~s", [DescText])
+               DescText -> io_lib:format(": ~ts", [DescText])
            end,
-    io_lib:format("~s~s~s", [format_function_name(Mod, Fun, Arity), Line, Desc]).
+    io_lib:format("~ts~ts~ts", [format_function_name(Mod, Fun, Arity), Line, Desc]).
 
 format_time(undefined) ->
     "? seconds";
@@ -318,9 +318,9 @@ format_time(Time) ->
     io_lib:format("~.3f seconds", [Time / 1000]).
 
 format_pending_reason({module_not_found, M}) ->
-    io_lib:format("Module '~s' missing", [M]);
+    io_lib:format("Module '~ts' missing", [M]);
 format_pending_reason({no_such_function, {M,F,A}}) ->
-    io_lib:format("Function ~s undefined", [format_function_name(M,F,A)]);
+    io_lib:format("Function ~ts undefined", [format_function_name(M,F,A)]);
 format_pending_reason({exit, Reason}) ->
     io_lib:format("Related process exited with reason: ~p", [Reason]);
 format_pending_reason(Reason) ->
@@ -335,7 +335,7 @@ format_assertion_failure(Type, Props, I) when Type =:= assertion_failed
     HasHamcrestProps = ([expected, actual, matcher] -- Keys) =:= [],
     if
         HasEUnitProps ->
-            [indent(I, "Failure/Error: ?assert(~s)~n", [proplists:get_value(expression, Props)]),
+            [indent(I, "Failure/Error: ?assert(~ts)~n", [proplists:get_value(expression, Props)]),
              indent(I, "  expected: true~n", []),
              case proplists:get_value(value, Props) of
                  false ->
@@ -356,8 +356,8 @@ format_assertion_failure(Type, Props, I) when Type =:= assertMatch_failed
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     Value = proplists:get_value(value, Props),
-    [indent(I, "Failure/Error: ?assertMatch(~s, ~s)~n", [Pattern, Expr]),
-     indent(I, "  expected: = ~s~n", [Pattern]),
+    [indent(I, "Failure/Error: ?assertMatch(~ts, ~ts)~n", [Pattern, Expr]),
+     indent(I, "  expected: = ~ts~n", [Pattern]),
      indent(I, "       got: ~p", [Value])];
 
 format_assertion_failure(Type, Props, I) when Type =:= assertNotMatch_failed
@@ -365,8 +365,8 @@ format_assertion_failure(Type, Props, I) when Type =:= assertNotMatch_failed
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     Value = proplists:get_value(value, Props),
-    [indent(I, "Failure/Error: ?assertNotMatch(~s, ~s)~n", [Pattern, Expr]),
-     indent(I, "  expected not: = ~s~n", [Pattern]),
+    [indent(I, "Failure/Error: ?assertNotMatch(~ts, ~ts)~n", [Pattern, Expr]),
+     indent(I, "  expected not: = ~ts~n", [Pattern]),
      indent(I, "           got:   ~p", [Value])];
 
 format_assertion_failure(Type, Props, I) when Type =:= assertEqual_failed
@@ -374,7 +374,7 @@ format_assertion_failure(Type, Props, I) when Type =:= assertEqual_failed
     Expr = proplists:get_value(expression, Props),
     Expected = proplists:get_value(expected, Props),
     Value = proplists:get_value(value, Props),
-    [indent(I, "Failure/Error: ?assertEqual(~w, ~s)~n", [Expected,
+    [indent(I, "Failure/Error: ?assertEqual(~w, ~ts)~n", [Expected,
                                                          Expr]),
      indent(I, "  expected: ~p~n", [Expected]),
      indent(I, "       got: ~p", [Value])];
@@ -383,7 +383,7 @@ format_assertion_failure(Type, Props, I) when Type =:= assertNotEqual_failed
                                             ; Type =:= assertNotEqual ->
     Expr = proplists:get_value(expression, Props),
     Value = proplists:get_value(value, Props),
-    [indent(I, "Failure/Error: ?assertNotEqual(~p, ~s)~n",
+    [indent(I, "Failure/Error: ?assertNotEqual(~p, ~ts)~n",
             [Value, Expr]),
      indent(I, "  expected not: == ~p~n", [Value]),
      indent(I, "           got:    ~p", [Value])];
@@ -393,14 +393,14 @@ format_assertion_failure(Type, Props, I) when Type =:= assertException_failed
     Expr = proplists:get_value(expression, Props),
     Pattern = proplists:get_value(pattern, Props),
     {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DATA
-    [indent(I, "Failure/Error: ?assertException(~s, ~s, ~s)~n", [Class, Term, Expr]),
+    [indent(I, "Failure/Error: ?assertException(~ts, ~ts, ~ts)~n", [Class, Term, Expr]),
      case proplists:is_defined(unexpected_success, Props) of
          true ->
-             [indent(I, "  expected: exception ~s but nothing was raised~n", [Pattern]),
+             [indent(I, "  expected: exception ~ts but nothing was raised~n", [Pattern]),
               indent(I, "       got: value ~p", [proplists:get_value(unexpected_success, Props)])];
          false ->
              Ex = proplists:get_value(unexpected_exception, Props),
-             [indent(I, "  expected: exception ~s~n", [Pattern]),
+             [indent(I, "  expected: exception ~ts~n", [Pattern]),
               indent(I, "       got: exception ~p", [Ex])]
      end];
 
@@ -410,8 +410,8 @@ format_assertion_failure(Type, Props, I) when Type =:= assertNotException_failed
     Pattern = proplists:get_value(pattern, Props),
     {Class, Term} = extract_exception_pattern(Pattern), % I hate that we have to do this, why not just give DAT
     Ex = proplists:get_value(unexpected_exception, Props),
-    [indent(I, "Failure/Error: ?assertNotException(~s, ~s, ~s)~n", [Class, Term, Expr]),
-     indent(I, "  expected not: exception ~s~n", [Pattern]),
+    [indent(I, "Failure/Error: ?assertNotException(~ts, ~ts, ~ts)~n", [Class, Term, Expr]),
+     indent(I, "  expected not: exception ~ts~n", [Pattern]),
      indent(I, "           got: exception ~p", [Ex])];
 
 format_assertion_failure(Type, Props, I) when Type =:= command_failed

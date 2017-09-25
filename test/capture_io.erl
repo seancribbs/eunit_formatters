@@ -109,10 +109,10 @@ loop(State = #state{leader = OldLeader, output = Output}) ->
                     ?MODULE:loop(NewState)
             end;
         {get_output, From} ->
-            From ! {output, erlang:iolist_to_binary(lists:reverse(Output))},
+            From ! {output, unicode:characters_to_binary(lists:reverse(Output))},
             ?MODULE:loop(State);
         {get_stop, From} ->
-            From ! {output, erlang:iolist_to_binary(lists:reverse(Output)), OldLeader},
+            From ! {output, unicode:characters_to_binary(lists:reverse(Output)), OldLeader},
             exit(normal);
         reset ->
             ?MODULE:loop(State#state{output = []});

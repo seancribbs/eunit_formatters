@@ -55,3 +55,18 @@ print_process_exit_test() ->
     end),
     Pattern = "Related process exited with reason(.|\n)*my_error",
     ?assertMatch(match, re:run(Output, Pattern, [{capture, none}])).
+
+%%
+%% Unicode binaries and atoms should print correctly. We are not
+%% setting the console IO option for utf8, but at least we won't crash
+%% on badarg. For example, instead of the "ą" in the test, you will
+%% see << "\x{105}" / utf8 >> printed.
+%%
+print_unicode_values_test() ->
+    {ok, Output, error} = capture_io:capture(fun () ->
+        Test = ?_assertMatch(<<"ą"/utf8>>, <<"a"/utf8>>),
+        eunit:test(Test, [no_tty, {report, {eunit_progress, [colored, profile]}}])
+    end),
+    io:format("%%%%%%%%%%%%%%%%~n~ts~n%%%%%%%%%%%%%%%%~n", [Output]),
+    Pattern = "\\{badarg,\\[\\{io_lib,format,",
+    ?assertMatch(nomatch, re:run(Output, Pattern, [{capture, none}, unicode])).
