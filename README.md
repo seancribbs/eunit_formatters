@@ -9,20 +9,25 @@ turned on:
 
 ## Setup
 
-Add `eunit_formatters` as a dep in your `rebar.config`, if using [rebar3](http://rebar3.org) place it under the `test` profile:
+### Rebar 3
 
-```erlang
-{profiles, [{test,
-            [{deps, [
-                    {eunit_formatters, ".*",
-                     {git, "git://github.com/seancribbs/eunit_formatters", {branch, "master"}}}
-                    ]}]}]}.
+[rebar3](https://github.com/erlang/rebar3) already includes this
+library! There's no need for special configuration at all.
+
+### erlang.mk
+
+For erlang.mk, add the following before `include erlang.mk`:
+
+``` Makefile
+TEST_DEPS = eunit_formatters
+
+EUNIT_OPTS = no_tty, {report, {eunit_progress, [colored, profile]}}
 ```
 
-Otherwise, when using rebar, simply add it to the normal deps list.
-
-Now configure eunit to use one of the output formatters (currently
-only `eunit_progress`):
+### Rebar 2 (legacy)
+Add `eunit_formatters` as a dep in your `rebar.config`. Now configure
+eunit to use one of the output formatters (currently only
+`eunit_progress`):
 
 ```erlang
 {eunit_opts, [
