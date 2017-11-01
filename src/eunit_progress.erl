@@ -463,5 +463,5 @@ indent(I, Fmt, Args) ->
     io_lib:format("~" ++ integer_to_list(I) ++ "s" ++ Fmt, [" "|Args]).
 
 extract_exception_pattern(Str) ->
-    ["{", Class, Term|_] = string:tokens(Str, ", "),
+    ["{", Class, Term|_] = re:split(Str, "[, ]{1,2}", [unicode,{return,list}]),
     {Class, Term}.
