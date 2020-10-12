@@ -23,11 +23,12 @@ basic_test() ->
         Tests = [
             fun () -> ?assert(true) end,
             fun () -> ?assert(false) end,
+            fun () -> ?assertNot(true) end,
             fun () -> error(some) end
         ],
         eunit:test(Tests, [no_tty, {report, {eunit_progress, [colored, profile]}}])
     end),
-    ?assertMatch(match, re:run(Output, "^.*\\..*F.*F.*\nFailures.*", [{capture, none}])).
+    ?assertMatch(match, re:run(Output, "^.*\\..*F.*F.*F.*\nFailures.*", [{capture, none}])).
 
 
 %%

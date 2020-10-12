@@ -350,11 +350,16 @@ format_assertion_failure(Type, Props, I) when Type =:= assertion_failed
     HasHamcrestProps = ([expected, actual, matcher] -- Keys) =:= [],
     if
         HasEUnitProps ->
-            [indent(I, "Failure/Error: ?assert(~ts)~n", [proplists:get_value(expression, Props)]),
-             indent(I, "  expected: true~n", []),
+            Expected = proplists:get_value(expected, Props),
+            AssertMacro = case Expected of
+                              true -> assert;
+                              false -> assertNot
+                          end,
+            [indent(I, "Failure/Error: ?~p(~ts)~n", [AssertMacro, proplists:get_value(expression, Props)]),
+             indent(I, "  expected: ~p~n", [Expected]),
              case proplists:get_value(value, Props) of
-                 false ->
-                     indent(I, "       got: false", []);
+                 Bool when is_boolean(Bool) ->
+                     indent(I, "       got: ~p", [Bool]);
                  {not_a_boolean, V} ->
                      indent(I, "       got: ~p", [V])
              end];
