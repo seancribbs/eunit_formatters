@@ -197,13 +197,14 @@ print_failure_reason({error, Reason}, Output, State) ->
     print_failure_output(5, Output, State).
 
 print_failure_output(_, <<>>, _) -> ok;
+print_failure_output(_, [<<>>], _) -> ok;
 print_failure_output(_, undefined, _) -> ok;
 print_failure_output(Indent, Output, State) ->
     print_colored(indent(Indent, "Output: ~ts", [Output]), ?CYAN, State).
 
 print_assertion_failure({Type, Props}, Stack, Output, State) ->
     FailureDesc = format_assertion_failure(Type, Props, 5),
-    {M,F,A,Loc} = lists:last(Stack),
+    {M,F,A,Loc} = lists:last(prune_trace(Stack)),
     LocationText = io_lib:format("     %% ~ts:~p:in `~ts`", [proplists:get_value(file, Loc),
                                                            proplists:get_value(line, Loc),
                                                            format_function_name(M,F,A)]),
@@ -213,6 +214,12 @@ print_assertion_failure({Type, Props}, Stack, Output, State) ->
     io:nl(),
     print_failure_output(5, Output, State),
     io:nl().
+
+%% This is a simplified version of eunit_test:prune_trace/2
+prune_trace([Entry | _]) when element(1, Entry) =:= eunit_test ->
+    [Entry];
+prune_trace(Stack) ->
+    lists:takewhile(fun(Entry) -> element(1, Entry) =/= eunit_test end, Stack).
 
 print_pending(#state{skips=[]}) ->
     ok;
